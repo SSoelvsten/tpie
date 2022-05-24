@@ -267,7 +267,7 @@ public:
 		// If we do overshoot, we will just spend the extra bytes on a run length
 		// longer than 1, which is probably what the user wants anyway.
 		sort_parameters tmp_p((sort_parameters()));
-		tmp_p.runLength = 1;
+		tmp_p.runLength = 128*1024/m_item_size;
 		tmp_p.fanout = calculate_fanout(std::numeric_limits<memory_size_type>::max(), 0);
 		return phase_1_memory(tmp_p);
 	}
