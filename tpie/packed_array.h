@@ -138,16 +138,27 @@ private:
 	/// \internal
 	/// \brief Iterator and reverse iterator will return an element
 	/// of this type, it can be cast to a T, and assigned a T value
+	///
+	/// \sa return_type
 	/////////////////////////////////////////////////////////
 	class iter_return_type {
 	private:
-		iter_return_type(storage_type * e, size_t i): elms(e), index(i) {}
+		template <typename, int> friend class packed_array;
+
 		storage_type * elms;
 		size_t index;
+
+		iter_return_type(storage_type * e, size_t i): elms(e), index(i)
+		{ }
+
 	public:
-		template <typename, int> friend class packed_array;
-		operator T() const {return static_cast<T>((elms[high(index)] >> low(index))&mask());}
-	 	iter_return_type & operator=(const T b) {
+		operator T() const
+		{
+			return static_cast<T>((elms[high(index)] >> low(index))&mask());
+		}
+
+	 	iter_return_type & operator=(const T b)
+		{
 			storage_type * p = elms+high(index);
 			size_t i = low(index);
 			*p = (*p & ~(mask()<<i)) | ((b & mask()) << i);
@@ -163,26 +174,48 @@ private:
 	template <bool forward>
 	class iter_base: public packed_array_iter_facade<iter_base<forward>, forward, iter_return_type> {
 	private:
-		iter_return_type elm;		
-		
 		friend class const_iter_base<forward>;
 		friend class packed_array;
 		template <typename, bool, typename> friend class packed_array_iter_facade;
+
+		iter_return_type elm;
+
 		iter_base(storage_type * elms, size_t index): elm(elms, index) {};
 
-		size_t & index() {return elm.index;}
-		const size_t & index() const {return elm.index;}
+		size_t & index()
+		{ return elm.index; }
+
+		const size_t & index() const
+		{ return elm.index; }
+
 	public:
 		typedef iter_return_type value_type;
 		typedef iter_return_type & reference;
 		typedef iter_return_type * pointer;
-		
-		iter_return_type & operator*() {return elm;}
-		iter_return_type * operator->() {return &elm;}
-		iter_base & operator=(const iter_base & o) {elm.index = o.elm.index; elm.elms=o.elm.elms; return *this;}
-		iter_base(iter_base const &o): elm(o.elm) {};
+
+		iter_base(iter_base const &o): elm(o.elm)
+		{ };
+
+		iter_return_type & operator*()
+		{ return elm; }
+
+		iter_return_type & operator*() const
+		{ return const_cast<iter_return_type&>(elm); }
+
+		iter_return_type * operator->()
+		{ return &elm; }
+
+		iter_return_type * operator->() const
+		{ return const_cast<iter_return_type*>(&elm); }
+
+		iter_base & operator=(const iter_base & o)
+		{
+			elm.index = o.elm.index;
+			elm.elms=o.elm.elms;
+			return *this;
+		}
 	};
-	
+
 	typedef T vssucks;
 	/////////////////////////////////////////////////////////
 	/// \internal
@@ -192,26 +225,44 @@ private:
 	template <bool forward>
 	class const_iter_base: public packed_array_iter_facade<const_iter_base<forward>, forward, vssucks> {
 	private:
-		const storage_type * elms;
-		size_t idx;
-		
 		friend class packed_array;
 		friend class boost::iterator_core_access;
 		template <typename, bool, typename> friend class packed_array_iter_facade;
-		const_iter_base(const storage_type * e, size_t i): elms(e), idx(i) {}
 
-		size_t & index() {return idx;}
-		const size_t & index() const {return idx;}
+		const storage_type * elms;
+		size_t idx;
+
+		const_iter_base(const storage_type * e, size_t i): elms(e), idx(i)
+		{ }
+
+		size_t & index()
+		{ return idx; }
+
+		const size_t & index() const
+		{ return idx; }
+
 	public:
 		typedef vssucks value_type;
 		typedef vssucks reference;
 		typedef vssucks * pointer;
 
-		const_iter_base & operator=(const const_iter_base & o) {idx = o.idx; elms=o.elms; return *this;}
-		vssucks operator*() const {return static_cast<T>(elms[high(idx)] >> low(idx) & mask());}
-		const_iter_base(const_iter_base const& o): elms(o.elms), idx(o.idx) {}
-		const_iter_base(iter_base<forward> const& o): elms(o.elm.elms), idx(o.elm.index) {}
-	};		
+		const_iter_base(const_iter_base const& o): elms(o.elms), idx(o.idx)
+		{ }
+
+		const_iter_base(iter_base<forward> const& o): elms(o.elm.elms), idx(o.elm.index)
+		{ }
+
+		const_iter_base & operator=(const const_iter_base & o)
+		{
+			idx = o.idx; elms=o.elms;
+			return *this;
+		}
+
+		vssucks operator*() const
+		{
+			return static_cast<T>(elms[high(idx)] >> low(idx) & mask());
+		}
+	};
 
 
 	/////////////////////////////////////////////////////////
@@ -219,19 +270,26 @@ private:
 	/// \brief This type is returned by the [] operator.
 	/// It can be cast to a T, and assigned a T value.
 	/////////////////////////////////////////////////////////
-	struct return_type{
+	struct return_type
+	{
 	private:
+		friend class packed_array;
+
 		storage_type * p;
 	 	size_t i;
+
 		return_type(storage_type * p_, size_t i_): p(p_), i(i_) {}
-		friend class packed_array;
 	public:
 	 	operator T() const {return static_cast<T>((*p >> i) & mask());}
-	 	return_type & operator=(const T b) {
+
+	 	return_type & operator=(const T b)
+	 	{
 			*p = (*p & ~(mask()<<i)) | ((static_cast<const storage_type>(b) & mask()) << i);
 	 		return *this;
 		}
-	 	return_type & operator=(const return_type & t){
+
+	 	return_type & operator=(const return_type & t)
+	 	{
 	 		*this = (T) t;
 	 		return *this;
 	 	}
@@ -239,7 +297,8 @@ private:
 
 	storage_type * m_elements;
 	size_t m_size;
-public:		
+
+public:
 	/////////////////////////////////////////////////////////
 	/// \brief Type of values containd in the array
 	/////////////////////////////////////////////////////////
