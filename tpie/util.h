@@ -105,8 +105,9 @@ struct linear_memory_base {
 	/// \return The amount of memory required in bytes
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_usage(memory_size_type size) noexcept {
-		return static_cast<memory_size_type>(
-			floor(static_cast<double>(size) * child_t::memory_coefficient() + child_t::memory_overhead()));
+		const double size_d = static_cast<double>(size);
+		const double memory_d = (size_d * child_t::memory_coefficient()) + child_t::memory_overhead();
+		return static_cast<memory_size_type>(floor(memory_d));
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -118,8 +119,9 @@ struct linear_memory_base {
 	/// \return The number of elements that will fit in the structure
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_fits(memory_size_type memory) noexcept {
-		return static_cast<memory_size_type>(
-			floor((static_cast<double>(memory) - child_t::memory_overhead()) / child_t::memory_coefficient()));
+		const double memory_d = static_cast<double>(memory);
+		const double size_d = (memory_d - child_t::memory_overhead()) / child_t::memory_coefficient();
+		return static_cast<memory_size_type>(floor(size_d));
 	}
 
 
