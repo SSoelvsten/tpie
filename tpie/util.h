@@ -119,7 +119,7 @@ struct linear_memory_base {
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_fits(memory_size_type memory) noexcept {
 		return static_cast<memory_size_type>(
-			floor((memory - child_t::memory_overhead()) / child_t::memory_coefficient()));
+			floor((static_cast<double>(memory) - child_t::memory_overhead()) / child_t::memory_coefficient()));
 	}
 
 
