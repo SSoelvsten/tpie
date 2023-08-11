@@ -224,6 +224,56 @@ bool iterator_bool_test() {
 	return true;
 }
 
+bool array_memory_prediction_test() {
+	// This test is designed to show a bug on Clang 15+ on RelDebInfo / Release
+	// builds.
+	//
+	// Here, the computation in 'memory_usage(...)' ends at the correct value
+	// but is cast to an unsigned long (32-bits) rather than an unsigned long
+	// long (64-bits).
+
+	// Test for all memory values between 64 bytes and 1 KiB
+	for (size_type i_mem=64; i_mem < 1024; ++i_mem) {
+		const memory_size_type size  = tpie::array<int>::memory_fits(i_mem);
+		const memory_size_type o_mem = tpie::array<int>::memory_usage(size);
+
+		TEST_ENSURE(o_mem <= i_mem,
+					"memory_fits() and memory_usage() expected to be their safe inverse");
+	}
+
+	{ // Test for maximum 'tpie::size_type' value
+		size_type i_mem = std::numeric_limits<size_type>::max();
+
+		const memory_size_type size  = tpie::array<int>::memory_fits(i_mem);
+		const memory_size_type o_mem = tpie::array<int>::memory_usage(size);
+
+		TEST_ENSURE(o_mem <= i_mem,
+					"memory_fits() and memory_usage() expected to be their safe inverse");
+	}
+
+	{ // Test for maximum 'tpie::memory_size_type' value
+		memory_size_type i_mem = std::numeric_limits<memory_size_type>::max();
+
+		const memory_size_type size  = tpie::array<int>::memory_fits(i_mem);
+		const memory_size_type o_mem = tpie::array<int>::memory_usage(size);
+
+		TEST_ENSURE(o_mem <= i_mem,
+					"memory_fits() and memory_usage() expected to be their safe inverse");
+	}
+
+	{ // Test for maximum 'std::size_t' value
+		std::size_t i_mem = std::numeric_limits<std::size_t>::max();
+
+		const memory_size_type size  = tpie::array<int>::memory_fits(i_mem);
+		const memory_size_type o_mem = tpie::array<int>::memory_usage(size);
+
+		TEST_ENSURE(o_mem <= i_mem,
+					"memory_fits() and memory_usage() expected to be their safe inverse");
+	}
+
+	return true;
+}
+
 class array_memory_test: public memory_test {
 public:
 	array<int> a;
@@ -470,6 +520,7 @@ int main(int argc, char **argv) {
 		.test(basic_test, "basic")
 		.test(iterator_test, "iterators")
 		.test(unique_ptr_test, "unique_ptr")
+		.test(array_memory_prediction_test, "memory_prediction")
 		.test(array_memory_test(), "memory")
 		.test(basic_bool_test, "bit_basic")
 		.test(iterator_bool_test, "bit_iterators")

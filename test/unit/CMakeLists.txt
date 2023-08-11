@@ -32,6 +32,7 @@ add_unittest(array
 	basic
 	iterators
 	unique_ptr
+	memory_prediction
 	memory
 	bit_basic
 	bit_iterators
