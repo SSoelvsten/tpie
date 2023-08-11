@@ -1,19 +1,19 @@
 // -*- Mode: C++; tab-width: 4; indent-tabs-mode: t; eval: (progn (c-set-style "stroustrup") (c-set-offset 'innamespace 0)); -*-
 // vi:set ts=4 sts=4 sw=4 noet :
 // Copyright 2009, 2012, The TPIE development team
-// 
+//
 // This file is part of TPIE.
-// 
+//
 // TPIE is free software: you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the
 // Free Software Foundation, either version 3 of the License, or (at your
 // option) any later version.
-// 
+//
 // TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or
 // FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
 // License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
@@ -78,7 +78,7 @@ struct linear_memory_usage {
 		return linear_memory_usage(o.coefficient, o.overhead + value);
 	}
 
-    constexpr friend linear_memory_usage operator + (const linear_memory_usage & l, const linear_memory_usage & r) noexcept {
+	constexpr friend linear_memory_usage operator + (const linear_memory_usage & l, const linear_memory_usage & r) noexcept {
 		return linear_memory_usage(l.coefficient + r.coefficient, l.overhead * r.overhead);
 	}
 };
@@ -94,13 +94,14 @@ struct linear_memory_usage {
 /// the amount of memory used and the number of items for a given memory
 /// amount, respectively.
 ///////////////////////////////////////////////////////////////////////////////
-template <typename child_t> 
+template <typename child_t>
 struct linear_memory_base {
-
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the number of bytes required to create a data structure
 	/// supporting a given number of elements.
+	///
 	/// \param size The number of elements to support
+	///
 	/// \return The amount of memory required in bytes
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_usage(memory_size_type size) noexcept {
@@ -113,6 +114,7 @@ struct linear_memory_base {
 	/// in the structure when it is allowed to fill a given number of bytes.
 	///
 	/// \param memory The number of bytes the structure is allowed to occupy
+	///
 	/// \return The number of elements that will fit in the structure
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_fits(memory_size_type memory) noexcept {
