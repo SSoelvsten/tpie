@@ -105,9 +105,11 @@ struct linear_memory_base {
 	/// \return The amount of memory required in bytes
 	///////////////////////////////////////////////////////////////////////////
 	static constexpr memory_size_type memory_usage(memory_size_type size) noexcept {
-		const double size_d = static_cast<double>(size);
-		const double memory_d = (size_d * child_t::memory_coefficient()) + child_t::memory_overhead();
-		return static_cast<memory_size_type>(floor(memory_d));
+		const double size_d    = static_cast<double>(size);
+		const double memory_d  = (size_d * child_t::memory_coefficient()) + child_t::memory_overhead();
+		constexpr double double_max = static_cast<double>(std::numeric_limits<memory_size_type>::max() / 2 + 1);
+		const double truncated = fmin(floor(memory_d), double_max);
+		return static_cast<memory_size_type>(truncated);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
